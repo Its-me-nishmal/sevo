@@ -57,17 +57,17 @@ const Login = () => {
                   <Mic className="w-8 h-8 text-white" />
                 </div>
               </div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 Sevo
               </h1>
             </div>
             
-            <p className="text-xl text-slate-300 font-medium">
+            <p className="text-lg sm:text-xl text-slate-300 font-medium">
               Speak. Don't Type. Connect with Real Voices.
             </p>
             
-            <p className="text-slate-400 text-sm max-w-md mx-auto md:mx-0">
-              Experience authentic communication through voice messages that disappear. 
+            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto md:mx-0">
+              Experience authentic communication through voice messages that disappear.
               No screenshots, no recordings, just genuine human connection.
             </p>
           </div>
@@ -99,14 +99,14 @@ const Login = () => {
           {/* Stats */}
           <div className="flex items-center justify-center md:justify-start gap-8 pt-4">
             <div className="text-center">
-              <div className="flex items-center gap-2 text-2xl font-bold text-white mb-1">
+              <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-white mb-1">
                 <Users className="w-5 h-5 text-blue-400" />
                 <span>10K+</span>
               </div>
               <p className="text-xs text-slate-400">Active Users</p>
             </div>
             <div className="text-center">
-              <div className="flex items-center gap-2 text-2xl font-bold text-white mb-1">
+              <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-white mb-1">
                 <MessageCircle className="w-5 h-5 text-purple-400" />
                 <span>1M+</span>
               </div>
@@ -128,7 +128,7 @@ const Login = () => {
                 <span className="text-sm font-medium text-blue-400">Get Started</span>
               </div>
               
-              <h2 className="text-3xl font-bold text-white mb-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
                 Welcome Back
               </h2>
               <p className="text-slate-400">
@@ -151,12 +151,12 @@ const Login = () => {
                 <svg viewBox="0 0 48 48" className="w-full h-full">
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                   <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19C6.51 42.62 14.62 48 24 48z"/>
                   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                 </svg>
               </div>
               
-              <span className="relative text-lg font-semibold text-gray-700">
+              <span className="relative text-base sm:text-lg font-semibold text-gray-700">
                 Continue with Google
               </span>
               

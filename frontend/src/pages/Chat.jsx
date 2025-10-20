@@ -312,7 +312,7 @@ const Chat = () => {
       </div>
 
       {/* Messages Container */}
-      <main ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+      <main ref={chatContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 custom-scrollbar">
         {messages.map((message) => {
           const isSender = message.senderId._id === user._id;
           const profileImage = message.senderId.profilePhoto || message.senderId.profileImage || 'https://via.placeholder.com/150/CCCCCC/FFFFFF?text=NA';
@@ -331,11 +331,11 @@ const Chat = () => {
             >
               {/* Left Avatar (Receiver) */}
               {!isSender && (
-                <div className="relative w-10 h-10 flex-shrink-0">
+                <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                   <img
                     src={profileImage}
                     alt={senderName}
-                    className="w-8 h-8 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ring-2 ring-slate-700"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ring-2 ring-slate-700"
                   />
                   <svg className="absolute top-0 left-0 w-full h-full transform -rotate-90">
                     <circle
@@ -365,13 +365,13 @@ const Chat = () => {
 
               {/* Message Bubble */}
               <div
-                className={`max-w-[70%] p-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 ${
+                className={`max-w-[80%] sm:max-w-[70%] p-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 ${
                   isSender
                     ? 'bg-gradient-to-br from-blue-500/90 to-purple-600/90 border-blue-400/30 rounded-br-none shadow-lg shadow-blue-500/20'
                     : 'bg-gradient-to-br from-slate-800/90 to-slate-700/90 border-slate-600/30 rounded-bl-none shadow-lg'
                 }`}
               >
-                <p className={`text-xs font-medium mb-2 ${isSender ? 'text-blue-100' : 'text-slate-300'}`}>
+                <p className={`text-[0.65rem] sm:text-xs font-medium mb-2 ${isSender ? 'text-blue-100' : 'text-slate-300'}`}>
                   {senderName}
                 </p>
                 <VoicePlayer
@@ -391,11 +391,11 @@ const Chat = () => {
 
               {/* Right Avatar (Sender) */}
               {isSender && (
-                <div className="relative w-10 h-10 flex-shrink-0">
+                <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
                   <img
                     src={profileImage}
                     alt={senderName}
-                    className="w-8 h-8 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ring-2 ring-slate-700"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ring-2 ring-slate-700"
                   />
                   <svg className="absolute top-0 left-0 w-full h-full transform -rotate-90">
                     <circle
@@ -429,12 +429,12 @@ const Chat = () => {
       </main>
 
       {/* Footer - Input Area */}
-      <div className="flex-shrink-0 p-4 border-t border-slate-700/50 backdrop-blur-xl bg-slate-900/95">
+      <div className="flex-shrink-0 p-3 sm:p-4 border-t border-slate-700/50 backdrop-blur-xl bg-slate-900/95">
         <div className="flex items-center gap-3">
           {/* Lifespan Toggle Button */}
           <button
             onClick={cycleLifespan}
-            className={`flex items-center justify-center gap-2 h-10 px-4 rounded-full text-white text-sm font-medium transition-all duration-200 active:scale-95 flex-shrink-0 ${getLifespanColor(selectedLifespan)}`}
+            className={`flex items-center justify-center gap-2 h-9 sm:h-10 px-3 sm:px-4 rounded-full text-white text-xs sm:text-sm font-medium transition-all duration-200 active:scale-95 flex-shrink-0 ${getLifespanColor(selectedLifespan)}`}
             title="Click to change message lifespan"
           >
             <Clock className="w-4 h-4" />

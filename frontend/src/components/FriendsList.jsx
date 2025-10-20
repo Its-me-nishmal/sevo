@@ -117,13 +117,13 @@ const FriendsList = ({ onSelectFriend }) => {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500" />
         
-        <div className="relative p-4 flex items-center gap-4">
+        <div className="relative p-3 sm:p-4 flex items-center gap-4">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
             <img
               src={getProfileImage()}
               alt={user.name}
-              className="relative w-12 h-12 rounded-full object-cover ring-2 ring-slate-700 group-hover:ring-blue-500 transition-all duration-300"
+              className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-slate-700 group-hover:ring-blue-500 transition-all duration-300"
             />
             {!isSearchResult && openChatStatuses[user._id] && (
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse" />
@@ -186,12 +186,12 @@ const FriendsList = ({ onSelectFriend }) => {
   return (
     <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-slate-700/50 backdrop-blur-sm bg-slate-900/50">
+      <div className="p-4 sm:p-6 border-b border-slate-700/50 backdrop-blur-sm bg-slate-900/50">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
             <Users className="w-6 h-6 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-white">Connections</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Connections</h2>
         </div>
         
         {/* Search Bar */}
@@ -213,7 +213,7 @@ const FriendsList = ({ onSelectFriend }) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Search Results */}
         {searchTerm.length > 0 && (
           <div className="space-y-4">
@@ -258,7 +258,7 @@ const FriendsList = ({ onSelectFriend }) => {
           {friends.length === 0 ? (
             <div className="text-center p-12 rounded-2xl bg-slate-800/30 border border-slate-700/50">
               <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-              <p className="text-slate-400 text-lg mb-2">No friends yet</p>
+              <p className="text-lg sm:text-xl text-slate-400 mb-2">No friends yet</p>
               <p className="text-slate-500 text-sm">Search above to find and add friends</p>
             </div>
           ) : (

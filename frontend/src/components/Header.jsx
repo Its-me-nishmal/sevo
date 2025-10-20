@@ -15,16 +15,16 @@ const Header = ({ title, showBackButton, onBack, chatPartnerStatus }) => {
         {/* Left section */}
         <div className="flex items-center gap-4">
           {showBackButton && (
-            <button 
-              onClick={onBack} 
+            <button
+              onClick={onBack}
               className="group p-2 rounded-xl bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 transition-all duration-300 hover:scale-105"
             >
-              <ArrowLeft className="w-5 h-5 text-slate-400 group-hover:text-blue-400 transition-colors duration-200" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-hover:text-blue-400 transition-colors duration-200" />
             </button>
           )}
           
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+            <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
               {title}
             </h1>
             
@@ -39,12 +39,12 @@ const Header = ({ title, showBackButton, onBack, chatPartnerStatus }) => {
 
         {/* Right section */}
         <div className="flex items-center gap-2">
-          <Link 
-            to="/profile" 
+          <Link
+            to="/profile"
             className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 transition-all duration-300 hover:scale-105"
           >
-            <User className="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors duration-200" />
-            <span className="hidden sm:inline text-sm font-medium text-slate-300 group-hover:text-blue-400 transition-colors duration-200">
+            <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 group-hover:text-blue-400 transition-colors duration-200" />
+            <span className="hidden sm:inline text-xs sm:text-sm font-medium text-slate-300 group-hover:text-blue-400 transition-colors duration-200">
               Profile
             </span>
           </Link>
@@ -53,8 +53,8 @@ const Header = ({ title, showBackButton, onBack, chatPartnerStatus }) => {
             onClick={logout}
             className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 hover:bg-red-500/20 border border-slate-700 hover:border-red-500/50 transition-all duration-300 hover:scale-105"
           >
-            <LogOut className="w-4 h-4 text-slate-400 group-hover:text-red-400 transition-colors duration-200" />
-            <span className="hidden sm:inline text-sm font-medium text-slate-300 group-hover:text-red-400 transition-colors duration-200">
+            <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 group-hover:text-red-400 transition-colors duration-200" />
+            <span className="hidden sm:inline text-xs sm:text-sm font-medium text-slate-300 group-hover:text-red-400 transition-colors duration-200">
               Logout
             </span>
           </button>
