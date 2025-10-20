@@ -3,17 +3,25 @@
   "name": "Sevo - Speak. Don't Type.",
   "icons": [
     {
-      "src": "/icons/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "https://placehold.co/64x64/7DD3FC/111827.png?text=SEVO&font=Raleway",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/icons/android-chrome-512x512.png",
+      "src": "https://placehold.co/192x192/7DD3FC/111827.png?text=SEVO&font=Raleway",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://placehold.co/512x512/7DD3FC/111827.png?text=SEVO&font=Raleway",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#4F46E5",
   "background_color": "#F9FAFB"
