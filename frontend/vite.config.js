@@ -8,7 +8,7 @@ export default defineConfig({
     port: 5173, // optional, ensures consistent port
     proxy: {
       '/uploads': {
-        target: 'http://localhost:5000', // backend server
+        target: 'https://api.sevo.nichu.dev', // backend server
         changeOrigin: true,
         secure: false,
       },
