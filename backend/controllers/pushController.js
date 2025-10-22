@@ -17,9 +17,6 @@ webpush.setVapidDetails(
   privateVapidKey
 );
 
-// Explicitly disable GCM to prevent "Must supply api_key" errors if GCM endpoints are encountered
-webpush.setGCMDetails(null);
-
 // @desc    Register a push subscription
 // @route   POST /api/subscribe
 // @access  Private
@@ -85,6 +82,12 @@ exports.sendPushNotification = async (userId, payload) => {
     const subscriptions = await PushSubscription.find({ userId });
 
     for (const sub of subscriptions) {
+      // Skip GCM endpoints if no API key is provided, as they cause "Must supply api_key" errors
+      if (sub.subscription.endpoint.includes('gcm')) {
+        console.warn(`Skipping GCM endpoint for user ${userId} due to missing API key: ${sub.subscription.endpoint}`);
+        continue;
+      }
+
       try {
         await webpush.sendNotification(sub.subscription, JSON.stringify(payload));
         console.log(`Push notification sent to user ${userId}`);
