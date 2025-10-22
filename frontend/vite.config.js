@@ -1,28 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server: {
-    host: true,
-    port: 5173,
-    proxy: {
-      '/uploads': {
-        target: 'https://api.sevo.nichu.dev',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
-  preview: {
-    host: true,
-    port: 5173, // 👈 same port for preview
-    proxy: {
-      '/uploads': {
-        target: 'https://api.sevo.nichu.dev',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+  define: {
+    'import.meta.env.VITE_VAPID_PUBLIC_KEY': JSON.stringify(process.env.VAPID_PUBLIC_KEY),
   },
 });

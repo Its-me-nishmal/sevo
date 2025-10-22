@@ -69,3 +69,32 @@ self.addEventListener('activate', (event) => {
     })
   );
 });
+
+self.addEventListener('push', (event) => {
+  const data = event.data.json();
+  console.log('Push received:', data);
+
+  const title = data.title || 'New Message';
+  const options = {
+    body: data.body || 'You have a new voice message.',
+    icon: data.icon || '/icons/icon-192x192.png', // Default icon
+    badge: '/icons/badge.png', // Optional: a small icon to display in the notification area
+    data: {
+      url: data.data.url || '/', // URL to open when notification is clicked
+      senderId: data.data.senderId,
+    },
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  console.log('Notification click received:', event.notification.data);
+  event.notification.close();
+
+  const urlToOpen = event.notification.data.url || '/';
+
+  event.waitUntil(
+    clients.openWindow(urlToOpen)
+  );
+});

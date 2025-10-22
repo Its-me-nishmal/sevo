@@ -9,6 +9,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const pushRoutes = require('./routes/pushRoutes');
 const http = require('http');
 const { initSocket, getIo } = require('./socket');
 const helmet = require('helmet');
@@ -73,6 +74,7 @@ app.use(passport.session());
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/messages', messageRoutes);
+app.use('/api/push', pushRoutes);
 
 // Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {

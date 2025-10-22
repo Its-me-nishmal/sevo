@@ -5,6 +5,7 @@ const cloudinary = require('../config/cloudinary');
 const fs = require('fs');
 const path = require('path');
 const { getIo } = require('../socket');
+const { sendPushNotification } = require('./pushController');
 const ffmpegPath = require('ffmpeg-static');
 const ffmpeg = require('fluent-ffmpeg');
 
@@ -103,6 +104,18 @@ exports.sendVoiceMessage = async (req, res) => {
     // Emit unread counts to both sender and receiver after a new message is sent
     io.to(receiverId).emit('unreadCountsUpdated');
     io.to(senderId).emit('unreadCountsUpdated');
+
+    // Send push notification to the receiver
+    const payload = {
+      title: `New Voice Message from ${voiceMessage.senderId.name}`,
+      body: 'Tap to listen!',
+      icon: voiceMessage.senderId.profilePhoto || voiceMessage.senderId.profileImage || 'https://placehold.co/192x192/7DD3FC/111827.png?text=SEVO&font=Raleway',
+      data: {
+        url: `/chat/${voiceMessage.senderId._id}`, // URL to open when notification is clicked
+        senderId: voiceMessage.senderId._id,
+      },
+    };
+    await sendPushNotification(receiverId, payload);
 
     res.status(201).json(voiceMessage);
   } catch (error) {
