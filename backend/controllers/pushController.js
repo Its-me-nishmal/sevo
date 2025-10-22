@@ -19,7 +19,7 @@ webpush.setVapidDetails(
 
 // Explicitly set GCM API key to an empty string to disable GCM,
 // preventing "Must supply api_key" errors for GCM endpoints.
-webpush.setGCMAPIKey('');
+// webpush.setGCMAPIKey('');
 
 // @desc    Register a push subscription
 // @route   POST /api/subscribe

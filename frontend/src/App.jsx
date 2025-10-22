@@ -32,7 +32,7 @@ function App() {
             console.log('No existing push subscription, subscribing...');
             const subscribeOptions = {
               userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY),
+              applicationServerKey: urlBase64ToUint8Array('BHDPjn_pm3c4YfJYUC2iNc9T9Vm16RWVuBDJBvOsU4q4PEvZkrTPJ-CIUHw3xhwiLMSTPlAeGJwEU2-UJch8l1c')
             };
             const newSubscription = await registration.pushManager.subscribe(subscribeOptions);
             console.log('New push subscription:', newSubscription);
