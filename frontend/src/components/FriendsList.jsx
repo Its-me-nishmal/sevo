@@ -110,7 +110,7 @@ const FriendsList = ({ onSelectFriend }) => {
 
     return (
       <div
-        className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 cursor-pointer"
+        className="group relative overflow-hidden rounded-2xl bg-secondary-light/50 dark:bg-secondary-dark/50 backdrop-blur-sm border border-secondary-light/50 dark:border-secondary-dark/50 hover:border-primary-light/50 dark:hover:border-primary-dark/50 transition-all duration-300 cursor-pointer"
         onClick={() => onSelectFriend(user)}
         onMouseEnter={() => setHoveredFriend(user._id)}
         onMouseLeave={() => setHoveredFriend(null)}
@@ -119,11 +119,11 @@ const FriendsList = ({ onSelectFriend }) => {
         
         <div className="relative p-3 sm:p-4 flex items-center gap-4">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-light to-purple-600 dark:from-primary-dark rounded-full blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
             <img
               src={getProfileImage()}
               alt={user.name}
-              className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-slate-700 group-hover:ring-blue-500 transition-all duration-300"
+              className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-secondary-light dark:ring-secondary-dark group-hover:ring-primary-light dark:group-hover:ring-primary-dark transition-all duration-300"
             />
             {!isSearchResult && openChatStatuses[user._id] && (
               <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse" />
@@ -131,15 +131,15 @@ const FriendsList = ({ onSelectFriend }) => {
           </div>
           
           <div className="flex-1 min-w-0">
-            <h4 className="text-white font-medium truncate group-hover:text-blue-400 transition-colors duration-200">
+            <h4 className="text-text-light dark:text-text-dark font-medium truncate group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors duration-200">
               {user.name}
             </h4>
-            <p className="text-slate-400 text-sm truncate">
+            <p className="text-text-light/70 dark:text-text-dark/70 text-sm truncate">
               {isSearchResult ? 'Add as friend' : 'Click to chat'}
             </p>
             {!isSearchResult && unreadCounts[user._id] > 0 && (
-              <div className="absolute top-1/2 right-4 -translate-y-1/2 flex items-center gap-1 text-blue-400 text-xs font-bold">
-                <PlayCircle className="w-4 h-4" />
+              <div className="absolute top-1/2 right-4 -translate-y-1/2 flex items-center gap-1 text-primary-light dark:text-primary-dark text-xs font-bold">
+                <PlayCircle className="w-4 h-4 text-primary-light dark:text-primary-dark" />
                 <span>{unreadCounts[user._id]}</span>
               </div>
             )}
@@ -147,12 +147,12 @@ const FriendsList = ({ onSelectFriend }) => {
           
           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             {isSearchResult ? (
-              <UserPlus className="w-5 h-5 text-blue-400" />
+              <UserPlus className="w-5 h-5 text-primary-light dark:text-primary-dark" />
             ) : (
               <>
-                <MessageCircle className="w-5 h-5 text-blue-400" />
+                <MessageCircle className="w-5 h-5 text-primary-light dark:text-primary-dark" />
                 {openChatStatuses[user._id] && (
-                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                  <CheckCircle2 className="w-4 h-4 text-green-500" />
                 )}
               </>
             )}
@@ -164,10 +164,10 @@ const FriendsList = ({ onSelectFriend }) => {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="flex-1 flex items-center justify-center bg-background-light dark:bg-background-dark">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
-          <p className="text-slate-400 text-lg">Loading your friends...</p>
+          <Loader2 className="w-12 h-12 text-primary-light dark:text-primary-dark animate-spin mx-auto mb-4" />
+          <p className="text-text-light/70 dark:text-text-dark/70 text-lg">Loading your friends...</p>
         </div>
       </div>
     );
@@ -175,39 +175,39 @@ const FriendsList = ({ onSelectFriend }) => {
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="flex-1 flex items-center justify-center bg-background-light dark:bg-background-dark">
         <div className="text-center p-8 rounded-2xl bg-red-500/10 border border-red-500/20">
-          <p className="text-red-400 text-lg">{error}</p>
+          <p className="text-red-500 text-lg">{error}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+    <div className="flex-1 flex flex-col h-screen bg-background-light text-text-light dark:bg-background-dark dark:text-text-dark overflow-hidden">
       {/* Header */}
-      <div className="p-4 sm:p-6 border-b border-slate-700/50 backdrop-blur-sm bg-slate-900/50">
+      <div className="p-4 sm:p-6 border-b border-secondary-light/50 dark:border-secondary-dark/50 backdrop-blur-sm bg-background-light/50 dark:bg-background-dark/50">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
-            <Users className="w-6 h-6 text-white" />
+          <div className="p-2 rounded-xl bg-gradient-to-br from-primary-light to-purple-600 dark:from-primary-dark">
+            <Users className="w-6 h-6 text-white" /> {/* Assuming white icon is fine for both themes */}
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white">Connections</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-text-light dark:text-text-dark">Connections</h2>
         </div>
         
         {/* Search Bar */}
         <div className={`relative transition-all duration-300 ${searchFocused ? 'scale-[1.02]' : ''}`}>
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-text-light/70 dark:text-text-dark/70" />
           <input
             type="text"
             placeholder="Discover new friends..."
-            className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:bg-slate-800 transition-all duration-200"
+            className="w-full pl-12 pr-4 py-3 rounded-xl bg-secondary-light/50 dark:bg-secondary-dark/50 border border-secondary-light dark:border-secondary-dark text-text-light dark:text-text-dark placeholder-text-light/50 dark:placeholder-text-dark/50 focus:outline-none focus:border-primary-light dark:focus:border-primary-dark focus:bg-secondary-light dark:focus:bg-secondary-dark transition-all duration-200"
             value={searchTerm}
             onChange={handleSearchChange}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setSearchFocused(false)}
           />
           {searchLoading && (
-            <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-500 animate-spin" />
+            <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary-light dark:text-primary-dark animate-spin" />
           )}
         </div>
       </div>
@@ -218,15 +218,15 @@ const FriendsList = ({ onSelectFriend }) => {
         {searchTerm.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
-              <h3 className="text-slate-300 font-semibold text-sm uppercase tracking-wider">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary-light/70 to-transparent dark:via-primary-dark/70" />
+              <h3 className="text-text-light/80 dark:text-text-dark/80 font-semibold text-sm uppercase tracking-wider">
                 Search Results
               </h3>
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary-light to-transparent dark:via-primary-dark" />
             </div>
             
             {searchError && (
-              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-center">
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-center">
                 {searchError}
               </div>
             )}
@@ -238,8 +238,8 @@ const FriendsList = ({ onSelectFriend }) => {
                 ))}
               </div>
             ) : !searchLoading && !searchError && (
-              <div className="text-center p-8 rounded-xl bg-slate-800/30 border border-slate-700/50">
-                <p className="text-slate-400">No users found</p>
+              <div className="text-center p-8 rounded-xl bg-secondary-light/30 dark:bg-secondary-dark/30 border border-secondary-light/50 dark:border-secondary-dark/50">
+                <p className="text-text-light/70 dark:text-text-dark/70">No users found</p>
               </div>
             )}
           </div>
@@ -248,18 +248,18 @@ const FriendsList = ({ onSelectFriend }) => {
         {/* Friends List */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
-            <h3 className="text-slate-300 font-semibold text-sm uppercase tracking-wider">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+            <h3 className="text-text-light/80 dark:text-text-dark/80 font-semibold text-sm uppercase tracking-wider">
               Your Friends ({friends.length})
             </h3>
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent" /> {/* Keeping purple for now */}
           </div>
           
           {friends.length === 0 ? (
-            <div className="text-center p-12 rounded-2xl bg-slate-800/30 border border-slate-700/50">
-              <Users className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-              <p className="text-lg sm:text-xl text-slate-400 mb-2">No friends yet</p>
-              <p className="text-slate-500 text-sm">Search above to find and add friends</p>
+            <div className="text-center p-12 rounded-2xl bg-secondary-light/30 dark:bg-secondary-dark/30 border border-secondary-light/50 dark:border-secondary-dark/50">
+              <Users className="w-16 h-16 text-text-light/50 dark:text-text-dark/50 mx-auto mb-4" />
+              <p className="text-lg sm:text-xl text-text-light/70 dark:text-text-dark/70 mb-2">No friends yet</p>
+              <p className="text-text-light/60 dark:text-text-dark/60 text-sm">Search above to find and add friends</p>
             </div>
           ) : (
             <div className="space-y-3">

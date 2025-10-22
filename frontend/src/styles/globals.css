@@ -8,7 +8,7 @@ html, body, #root {
   height: 100%;
   margin: 0;
   font-family: 'Inter', sans-serif;
-  @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-50;
+  @apply bg-background-light text-text-light dark:bg-background-dark dark:text-text-dark;
 }
 
 /* Custom scrollbar for chat */
@@ -17,18 +17,18 @@ html, body, #root {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-gray-200 dark:bg-gray-700;
+  @apply bg-secondary-light dark:bg-secondary-dark;
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-indigo-400 dark:bg-indigo-600;
+  @apply bg-primary-light dark:bg-primary-dark;
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  @apply bg-indigo-500 dark:bg-indigo-700;
-}
+  @apply bg-primary-dark dark:bg-primary-light; /* Slightly adjust hover color */
+  }
 
 /* Fade-out animation for expiring messages */
 @keyframes fadeOut {
@@ -44,4 +44,26 @@ html, body, #root {
 
 .fade-out {
   animation: fadeOut 0.5s forwards;
+}
+
+/* Disable hover effects on touch devices */
+@media (hover: none) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  a, button, input, textarea, select, [role="button"] {
+    cursor: default !important;
+  }
+
+  /* Remove hover styles */
+  *:hover {
+    background-color: initial !important;
+    color: initial !important;
+    border-color: initial !important;
+    box-shadow: initial !important;
+    transform: initial !important;
+    opacity: initial !important;
+  }
 }

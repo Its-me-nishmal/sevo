@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sevo-cache-v7'; // Increment cache version to force update
+const CACHE_NAME = 'sevo-cache-v6'; // Increment cache version to force update
 const STATIC_ASSETS = [
   '/',
   '/index.html',

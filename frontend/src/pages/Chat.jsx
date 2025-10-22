@@ -18,116 +18,67 @@ const Chat = () => {
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const shouldScrollToBottom = useRef(true);
-  const messageRefs = useRef({});
-  
-  // Auto-play state
-  const [currentPlayingId, setCurrentPlayingId] = useState(null);
-  const [autoPlayQueue, setAutoPlayQueue] = useState([]);
 
-  // Lifespan state with localStorage persistence per chat
+  // Lifespan
   const [selectedLifespan, setSelectedLifespan] = useState(() => {
     const stored = localStorage.getItem(`chat_lifespan_${receiverId}`);
     return stored || '3h';
   });
 
-  // Save to localStorage whenever lifespan changes
   useEffect(() => {
     if (receiverId) {
       localStorage.setItem(`chat_lifespan_${receiverId}`, selectedLifespan);
     }
   }, [selectedLifespan, receiverId]);
 
-  // Cycle through lifespan options
   const cycleLifespan = () => {
-    setSelectedLifespan(prev => {
-      if (prev === '3m') return '3h';
-      if (prev === '3h') return '3d';
-      return '3m';
-    });
+    setSelectedLifespan(prev => (prev === '3m' ? '3h' : prev === '3h' ? '3d' : '3m'));
   };
 
-  // Get display text for lifespan
-  const getLifespanDisplay = (lifespan) => {
-    switch (lifespan) {
-      case '3m': return 'Whisper (3m)';
-      case '3h': return 'Echo (3h)';
-      case '3d': return 'Memory (3d)';
-      default: return 'Echo (3h)';
-    }
-  };
+  const getLifespanDisplay = (l) => ({ '3m': '3m', '3h': '3h', '3d': '3d' }[l] || '3h');
+  const getLifespanColor = (l) => ({
+    '3m': 'bg-red-500 hover:bg-red-600',
+    '3h': 'bg-amber-500 hover:bg-amber-600',
+    '3d': 'bg-blue-500 hover:bg-blue-600',
+  }[l] || 'bg-amber-500');
 
-  // Get color for lifespan button
-  const getLifespanColor = (lifespan) => {
-    switch (lifespan) {
-      case '3m': return 'bg-red-500 hover:bg-red-600';
-      case '3h': return 'bg-yellow-500 hover:bg-yellow-600';
-      case '3d': return 'bg-blue-500 hover:bg-blue-600';
-      default: return 'bg-yellow-500 hover:bg-yellow-600';
-    }
-  };
-
-  const calculateTotalLifespanSeconds = useCallback((lifespan) => {
-    switch (lifespan) {
-      case '3m': return 3 * 60;
-      case '3h': return 3 * 60 * 60;
-      case '3d': return 3 * 24 * 60 * 60;
-      default: return 3 * 60 * 60;
-    }
+  const handleMessagePlayed = useCallback(async (id) => {
+    try { await api.put(`/messages/${id}/read`); } catch (e) { console.error(e); }
   }, []);
 
-  const handleMessagePlayed = useCallback(async (messageId) => {
-    try {
-      await api.put(`/messages/${messageId}/read`);
-    } catch (error) {
-      console.error('Error marking message as read:', error);
+  const buildAutoPlayQueue = useCallback((startId) => {
+    const idx = messages.findIndex(m => m._id === startId);
+    if (idx === -1) return [];
+    const queue = [startId];
+    const sender = messages[idx].senderId._id;
+    for (let i = idx + 1; i < messages.length; i++) {
+      if (messages[i].senderId._id === sender) queue.push(messages[i]._id);
+      else break;
     }
-  }, []);
-
-  // Build auto-play queue: get consecutive messages from same sender
-  const buildAutoPlayQueue = useCallback((startMessageId) => {
-    const startIndex = messages.findIndex(msg => msg._id === startMessageId);
-    if (startIndex === -1) return [];
-
-    const queue = [startMessageId];
-    const startSenderId = messages[startIndex].senderId._id;
-
-    // Look forward for consecutive messages from same sender
-    for (let i = startIndex + 1; i < messages.length; i++) {
-      if (messages[i].senderId._id === startSenderId) {
-        queue.push(messages[i]._id);
-      } else {
-        break; // Stop when sender changes
-      }
-    }
-
     return queue;
   }, [messages]);
 
-  // Handle when a message finishes playing
-  const handleMessageFinished = useCallback((messageId) => {
-    setAutoPlayQueue(prevQueue => {
-      const currentIndex = prevQueue.indexOf(messageId);
-      
-      // If this message is in the queue and there's a next message
-      if (currentIndex !== -1 && currentIndex < prevQueue.length - 1) {
-        const nextMessageId = prevQueue[currentIndex + 1];
-        setCurrentPlayingId(nextMessageId);
-        return prevQueue;
-      } else {
-        // Queue finished
-        setCurrentPlayingId(null);
-        return [];
+  const [currentPlayingId, setCurrentPlayingId] = useState(null);
+  const [autoPlayQueue, setAutoPlayQueue] = useState([]);
+
+  const handleMessageStarted = useCallback((id) => {
+    setCurrentPlayingId(id);
+    setAutoPlayQueue(buildAutoPlayQueue(id));
+  }, [buildAutoPlayQueue]);
+
+  const handleMessageFinished = useCallback((id) => {
+    setAutoPlayQueue(prev => {
+      const idx = prev.indexOf(id);
+      if (idx > -1 && idx < prev.length - 1) {
+        setCurrentPlayingId(prev[idx + 1]);
+        return prev;
       }
+      setCurrentPlayingId(null);
+      return [];
     });
   }, []);
 
-  // Handle when user manually starts playing a message
-  const handleMessageStarted = useCallback((messageId) => {
-    setCurrentPlayingId(messageId);
-    const queue = buildAutoPlayQueue(messageId);
-    setAutoPlayQueue(queue);
-  }, [buildAutoPlayQueue]);
-
+  // Scroll
   useEffect(() => {
     if (shouldScrollToBottom.current && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -135,71 +86,51 @@ const Chat = () => {
   }, [messages]);
 
   useEffect(() => {
-    const chatContainer = chatContainerRef.current;
-    if (!chatContainer) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = chatContainer;
-      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
-      shouldScrollToBottom.current = isAtBottom;
+    const container = chatContainerRef.current;
+    if (!container) return;
+    const onScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      shouldScrollToBottom.current = scrollHeight - scrollTop - clientHeight < 50;
     };
-
-    chatContainer.addEventListener('scroll', handleScroll);
-    return () => chatContainer.removeEventListener('scroll', handleScroll);
+    container.addEventListener('scroll', onScroll);
+    return () => container.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Load data
   useEffect(() => {
     if (!user) return;
 
-    const fetchReceiver = async () => {
+    const fetch = async () => {
       try {
-        const res = await api.get(`/users/${receiverId}`);
-        setReceiver(res.data);
-      } catch (error) {
-        console.error('Error fetching receiver details:', error);
-        navigate('/');
-      }
-    };
-
-    const fetchMessages = async () => {
-      try {
-        const res = await api.get(`/messages/${receiverId}`);
-        setMessages(res.data.map(msg => ({
-          ...msg,
+        const [userRes, msgRes] = await Promise.all([
+          api.get(`/users/${receiverId}`),
+          api.get(`/messages/${receiverId}`)
+        ]);
+        setReceiver(userRes.data);
+        setMessages(msgRes.data.map(m => ({
+          ...m,
           timeRemainingPercentage: 100,
           isExpired: false,
           _isBeingRemoved: false,
           remainingSeconds: 0,
         })));
-      } catch (error) {
-        console.error('Error fetching messages:', error);
+      } catch (e) {
+        console.error(e);
+        navigate('/');
       }
     };
 
-    fetchReceiver();
-    fetchMessages();
+    fetch();
 
     socket.emit('joinChat', user._id);
     socket.emit('chatOpened', { userId: user._id, chatPartnerId: receiverId });
 
-    socket.on('newVoiceMessage', (newMessage) => {
-      setMessages((prevMessages) => [...prevMessages, {
-        ...newMessage,
-        timeRemainingPercentage: 100,
-        isExpired: false,
-        _isBeingRemoved: false,
-        remainingSeconds: 0,
-      }]);
+    socket.on('newVoiceMessage', (msg) => {
+      setMessages(p => [...p, { ...msg, timeRemainingPercentage: 100, isExpired: false, _isBeingRemoved: false, remainingSeconds: 0 }]);
     });
 
-    socket.on('messageRead', (updatedMessage) => {
-      setMessages(prevMessages =>
-        prevMessages.map(msg =>
-          msg._id === updatedMessage._id
-            ? { ...msg, isRead: updatedMessage.isRead, expiresAt: updatedMessage.expiresAt }
-            : msg
-        )
-      );
+    socket.on('messageRead', (msg) => {
+      setMessages(p => p.map(m => m._id === msg._id ? { ...m, isRead: msg.isRead, expiresAt: msg.expiresAt } : m));
     });
 
     socket.on('chatStatus', ({ friendId, status, context }) => {
@@ -212,97 +143,71 @@ const Chat = () => {
       socket.emit('leaveChat', user._id);
       socket.emit('chatClosed', { userId: user._id, chatPartnerId: receiverId });
       socket.off('newVoiceMessage');
-      socket.off('chatStatus');
       socket.off('messageRead');
-      socket.off('unreadCountsUpdated');
+      socket.off('chatStatus');
     };
   }, [receiverId, user, navigate]);
 
-  // Effect to mark messages as read when chat is opened
   useEffect(() => {
-    if (messages.length > 0 && user) {
-      messages.forEach(message => {
-        if (!message.isRead && message.receiverId._id === user._id) {
-          handleMessagePlayed(message._id);
-        }
-      });
-    }
+    messages.forEach(m => {
+      if (!m.isRead && m.receiverId._id === user._id) {
+        handleMessagePlayed(m._id);
+      }
+    });
   }, [messages, user, handleMessagePlayed]);
 
   const handleSendVoiceMessage = async (audioBlob) => {
-    if (!user || !receiverId || !audioBlob) return;
-
+    if (!audioBlob || !receiverId) return;
     shouldScrollToBottom.current = true;
 
-    const fileType = audioBlob.type.split('/')[1] || 'webm';
     const formData = new FormData();
-    formData.append('audio', audioBlob, `voice_message.${fileType}`);
+    const ext = audioBlob.type.split('/')[1] || 'webm';
+    formData.append('audio', audioBlob, `voice.${ext}`);
     formData.append('receiverId', receiverId);
     formData.append('lifespan', selectedLifespan);
 
     try {
       await api.post('/messages/send', formData);
-    } catch (error) {
-      console.error('Error sending voice message:', error);
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const handleMessageTimeUpdate = useCallback((messageId, percentage, expired, currentRemainingSeconds) => {
-    setMessages(prevMessages => {
-      let messageUpdated = false;
-      const updatedMessages = prevMessages.map(msg => {
-        if (msg._id === messageId) {
-          let newRemainingSeconds = msg.remainingSeconds;
-          if (msg.lifespan === '3m' || !msg.isRead || Math.abs(msg.remainingSeconds - currentRemainingSeconds) >= 30) {
-            newRemainingSeconds = currentRemainingSeconds;
-          }
-
-          if (msg.timeRemainingPercentage !== percentage || msg.isExpired !== expired || msg.remainingSeconds !== newRemainingSeconds) {
-            messageUpdated = true;
-            return { ...msg, timeRemainingPercentage: percentage, isExpired: expired, remainingSeconds: newRemainingSeconds };
-          }
+  const handleMessageTimeUpdate = useCallback((id, p, e, r) => {
+    setMessages(prev => {
+      let changed = false;
+      const updated = prev.map(m => {
+        if (m._id !== id) return m;
+        let newR = m.remainingSeconds;
+        if (m.lifespan === '3m' || !m.isRead || Math.abs(m.remainingSeconds - r) >= 30) {
+          newR = r;
         }
-        return msg;
+        if (m.timeRemainingPercentage !== p || m.isExpired !== e || m.remainingSeconds !== newR) {
+          changed = true;
+          return { ...m, timeRemainingPercentage: p, isExpired: e, remainingSeconds: newR };
+        }
+        return m;
       });
-      return messageUpdated ? updatedMessages : prevMessages;
+      return changed ? updated : prev;
     });
   }, []);
 
-  const handleMessageExpired = useCallback((messageId) => {
-    setMessages(prevMessages =>
-      prevMessages.map(msg =>
-        msg._id === messageId
-          ? { ...msg, _isBeingRemoved: true }
-          : msg
-      )
-    );
-    setTimeout(() => {
-      setMessages(prevMessages => prevMessages.filter(msg => msg._id !== messageId));
-    }, 500);
+  const handleMessageExpired = useCallback((id) => {
+    setMessages(p => p.map(m => m._id === id ? { ...m, _isBeingRemoved: true } : m));
+    setTimeout(() => setMessages(p => p.filter(m => m._id !== id)), 300);
   }, []);
 
-  const getProgressColorClass = useCallback((message) => {
-    if (!message.isRead) {
-      return 'text-blue-500';
-    }
-
-    if (message.remainingSeconds > 3 * 24 * 60 * 60) {
-      return 'text-green-500';
-    } else if (message.remainingSeconds > 3 * 60 * 60) {
-      return 'text-green-500';
-    } else if (message.remainingSeconds > 3 * 60) {
-      return 'text-orange-500';
-    } else if (message.remainingSeconds > 0) {
-      return 'text-red-500';
-    } else {
-      return 'text-red-500';
-    }
-  }, []);
+  const getProgressColor = (sec, read) => {
+    if (!read) return 'text-blue-500';
+    if (sec > 3 * 3600) return 'text-green-500';
+    if (sec > 180) return 'text-amber-500';
+    return 'text-red-500';
+  };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
       {/* Header */}
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 border-b border-gray-200 dark:border-gray-800">
         <Header
           title={receiver?.name || 'Chat'}
           showBackButton={true}
@@ -311,142 +216,118 @@ const Chat = () => {
         />
       </div>
 
-      {/* Messages Container */}
-      <main ref={chatContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 custom-scrollbar">
+      {/* Messages */}
+      <main
+        ref={chatContainerRef}
+        className="flex-1 overflow-y-auto px-3 py-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
+      >
         {messages.map((message) => {
           const isSender = message.senderId._id === user._id;
-          const profileImage = message.senderId.profilePhoto || message.senderId.profileImage || 'https://via.placeholder.com/150/CCCCCC/FFFFFF?text=NA';
-          const senderName = message.senderId.name || 'Unknown User';
-          const circumference = 2 * Math.PI * 18;
-          const strokeDashoffset = circumference - (message.timeRemainingPercentage / 100) * circumference;
-          const progressColorClass = getProgressColorClass(message);
-          const shouldAutoPlay = currentPlayingId === message._id;
+          const img = message.senderId.profilePhoto || message.senderId.profileImage || 'https://via.placeholder.com/32';
+          const name = message.senderId.name || 'User';
+          const c = 2 * Math.PI * 14;
+          const offset = c - (message.timeRemainingPercentage / 100) * c;
+          const color = getProgressColor(message.remainingSeconds, message.isRead);
+          const autoPlay = currentPlayingId === message._id;
 
           return (
             <div
               key={message._id}
-              ref={el => (messageRefs.current[message._id] = el)}
-              data-message-id={message._id}
-              className={`flex items-end gap-3 ${isSender ? 'justify-end' : 'justify-start'} ${message._isBeingRemoved ? 'fade-out' : ''}`}
+              className={`flex items-end gap-2 ${isSender ? 'justify-end' : 'justify-start'} ${message._isBeingRemoved ? 'animate-fadeOut' : ''}`}
             >
-              {/* Left Avatar (Receiver) */}
-              {!isSender && (
-                <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
-                  <img
-                    src={profileImage}
-                    alt={senderName}
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ring-2 ring-slate-700"
-                  />
-                  <svg className="absolute top-0 left-0 w-full h-full transform -rotate-90">
-                    <circle
-                      className="text-slate-700"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="18"
-                      cx="20"
-                      cy="20"
-                    />
-                    <circle
-                      className={`${progressColorClass} transition-all duration-1000 ease-linear`}
-                      strokeWidth="2"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={strokeDashoffset}
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="18"
-                      cx="20"
-                      cy="20"
-                    />
-                  </svg>
-                </div>
-              )}
+             {/* Avatar */}
+<div className="relative w-8 h-8 flex-shrink-0 p-1 bg-white dark:bg-gray-950 rounded-full">
+  <img
+    src={img}
+    alt={name}
+    className="w-full h-full rounded-full object-cover ring-1 ring-gray-300 dark:ring-gray-700"
+  />
+  <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
+    <circle cx="16" cy="16" r="14.5" stroke="currentColor" strokeWidth="1.5" fill="none" className="text-gray-200 dark:text-gray-800" />
+    <circle
+      cx="16" cy="16" r="14.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      fill="none"
+      strokeDasharray={2 * Math.PI * 14.5}
+      strokeDashoffset={offset}
+      strokeLinecap="round"
+      className={`transition-all duration-1000 ease-linear ${color}`}
+    />
+  </svg>
+</div>
 
-              {/* Message Bubble */}
-              <div
-                className={`max-w-[80%] sm:max-w-[70%] p-4 rounded-2xl backdrop-blur-sm border transition-all duration-300 ${
-                  isSender
-                    ? 'bg-gradient-to-br from-blue-500/90 to-purple-600/90 border-blue-400/30 rounded-br-none shadow-lg shadow-blue-500/20'
-                    : 'bg-gradient-to-br from-slate-800/90 to-slate-700/90 border-slate-600/30 rounded-bl-none shadow-lg'
-                }`}
-              >
-                <p className={`text-[0.65rem] sm:text-xs font-medium mb-2 ${isSender ? 'text-blue-100' : 'text-slate-300'}`}>
-                  {senderName}
-                </p>
+
+              {/* Bubble */}
+              <div className={`
+                max-w-[75%] px-3 py-2 rounded-2xl text-sm
+                ${isSender
+                  ? 'bg-blue-600 text-white rounded-br-none'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-none'
+                }
+              `}>
+                <p className="text-xs opacity-70 mb-1 font-medium">{name}</p>
                 <VoicePlayer
                   audioUrl={message.audioUrl}
                   lifespan={message.lifespan}
                   createdAt={message.createdAt}
                   isRead={message.isRead}
                   expiresAt={message.expiresAt}
-                  autoPlay={shouldAutoPlay}
-                  onTimeUpdate={(percentage, expired, remainingSeconds) => handleMessageTimeUpdate(message._id, percentage, expired, remainingSeconds)}
+                  autoPlay={autoPlay}
+                  onTimeUpdate={(p, e, r) => handleMessageTimeUpdate(message._id, p, e, r)}
                   onMessageExpired={() => handleMessageExpired(message._id)}
                   onMessagePlayed={() => handleMessagePlayed(message._id)}
                   onPlayStarted={() => handleMessageStarted(message._id)}
                   onPlayEnded={() => handleMessageFinished(message._id)}
                 />
               </div>
-
-              {/* Right Avatar (Sender) */}
-              {isSender && (
-                <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
-                  <img
-                    src={profileImage}
-                    alt={senderName}
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ring-2 ring-slate-700"
-                  />
-                  <svg className="absolute top-0 left-0 w-full h-full transform -rotate-90">
-                    <circle
-                      className="text-slate-700"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="18"
-                      cx="20"
-                      cy="20"
-                    />
-                    <circle
-                      className={`${progressColorClass} transition-all duration-1000 ease-linear`}
-                      strokeWidth="2"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={strokeDashoffset}
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="18"
-                      cx="20"
-                      cy="20"
-                    />
-                  </svg>
-                </div>
-              )}
             </div>
           );
         })}
         <div ref={messagesEndRef} />
       </main>
 
-      {/* Footer - Input Area */}
-      <div className="flex-shrink-0 p-3 sm:p-4 border-t border-slate-700/50 backdrop-blur-xl bg-slate-900/95">
-        <div className="flex items-center gap-3">
-          {/* Lifespan Toggle Button */}
+      {/* Input Bar */}
+      <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-3">
+        <div className="flex items-center gap-2">
+          {/* Lifespan Button */}
           <button
             onClick={cycleLifespan}
-            className={`flex items-center justify-center gap-2 h-9 sm:h-10 px-3 sm:px-4 rounded-full text-white text-xs sm:text-sm font-medium transition-all duration-200 active:scale-95 flex-shrink-0 ${getLifespanColor(selectedLifespan)}`}
-            title="Click to change message lifespan"
+            className={`
+              flex items-center gap-1.5 px-3 h-9 rounded-full text-white text-xs font-medium
+              transition-all active:scale-95 flex-shrink-0
+              ${getLifespanColor(selectedLifespan)}
+            `}
           >
-            <Clock className="w-4 h-4" />
-            <span className="whitespace-nowrap">{getLifespanDisplay(selectedLifespan)}</span>
+            <Clock className="w-3.5 h-3.5" />
+            <span>{getLifespanDisplay(selectedLifespan)}</span>
           </button>
 
-          {/* Voice Recorder */}
-          <div className="flex-1">
+          {/* Mic on Right */}
+          <div className="flex-1" /> {/* Spacer */}
+          <div className="flex-shrink-0">
             <VoiceRecorder onSend={handleSendVoiceMessage} />
           </div>
         </div>
       </div>
+
+      {/* CSS */}
+      <style jsx>{`
+        @keyframes fadeOut {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(-8px); }
+        }
+        .animate-fadeOut { animation: fadeOut 0.3s ease-out forwards; }
+        .scrollbar-thin { scrollbar-width: thin; }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background-color: rgba(156, 163, 175, 0.5);
+          border-radius: 3px;
+        }
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+          background-color: rgba(107, 114, 128, 0.5);
+        }
+      `}</style>
     </div>
   );
 };
