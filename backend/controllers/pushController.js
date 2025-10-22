@@ -17,6 +17,9 @@ webpush.setVapidDetails(
   privateVapidKey
 );
 
+// Explicitly disable GCM to prevent "Must supply api_key" errors if GCM endpoints are encountered
+webpush.setGCMDetails(null);
+
 // @desc    Register a push subscription
 // @route   POST /api/subscribe
 // @access  Private
