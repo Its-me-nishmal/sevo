@@ -1,9 +1,15 @@
 const webpush = require('web-push');
 const PushSubscription = require('../models/PushSubscription');
+const dotenv = require('dotenv')
+dotenv.config();
+
 
 // VAPID keys from environment variables
 const publicVapidKey = process.env.VAPID_PUBLIC_KEY;
 const privateVapidKey = process.env.VAPID_PRIVATE_KEY;
+
+console.log('VAPID_PUBLIC_KEY:', publicVapidKey);
+console.log('VAPID_PRIVATE_KEY:', privateVapidKey);
 
 webpush.setVapidDetails(
   'mailto:your_email@example.com', // Replace with your email
